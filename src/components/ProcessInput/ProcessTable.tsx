@@ -16,8 +16,8 @@ function NumericInput({ value, min, className, onChange }: NumericInputProps) {
     setLocalValue(String(value));
   }, [value]);
 
-  const commit = () => {
-    const raw = localValue.trim();
+  const commit = (inputValue: string) => {
+    const raw = inputValue.trim();
     let finalValue = value; // Default to previous safe value
 
     if (raw !== '') {
@@ -41,8 +41,13 @@ function NumericInput({ value, min, className, onChange }: NumericInputProps) {
       value={localValue}
       onChange={(e) => setLocalValue(e.target.value)}
       onFocus={(e) => e.target.select()}
-      onBlur={commit}
-      onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+      onBlur={(e) => commit(e.target.value)}
+      onKeyDown={(e) => { 
+        if (e.key === 'Enter') {
+          commit(e.currentTarget.value);
+          e.currentTarget.blur(); 
+        }
+      }}
     />
   );
 }
