@@ -1,0 +1,174 @@
+import { useCallback } from 'react';
+import { Process, getProcessColor } from '../../algorithms/types';
+
+interface ProcessTableProps {
+  processes: Process[];
+  onChange: (processes: Process[]) => void;
+  showPriority?: boolean;
+  queueOptions?: { id: string; name: string }[];
+  showQueue?: boolean;
+}
+
+let nextId = 1;
+function genId() { return `p${nextId++}`; }
+
+export function ProcessTable({ processes, onChange, showPriority = false, queueOptions, showQueue = false }: ProcessTableProps) {
+  const addProcess = useCallback(() => {
+    if (processes.length >= 10) return;
+    const id = genId();
+    const newP: Process = {
+      id,
+      name: `P${processes.length + 1}`,
+      arrivalTime: 0,
+      burstTime: 1,
+      priority: 1,
+      queueId: queueOptions?.[0]?.id,
+      color: getProcessColor(processes.length),
+    };
+    onChange([...processes, newP]);
+  }, [processes, onChange, queueOptions]);
+
+  const removeProcess = useCallback((id: string) => {
+    onChange(processes.filter((p) => p.id !== id));
+  }, [processes, onChange]);
+
+  const updateProcess = useCallback((id: string, field: keyof Process, value: string | number) => {
+    onChange(processes.map((p) => p.id === id ? { ...p, [field]: value } : p));
+  }, [processes, onChange]);
+
+  const loadDefault = useCallback(() => {
+    const defaults: Omit<Process, 'id' | 'color'>[] = [
+      { name: 'P1', arrivalTime: 0, burstTime: 6, priority: 2 },
+      { name: 'P2', arrivalTime: 1, burstTime: 4, priority: 1 },
+      { name: 'P3', arrivalTime: 2, burstTime: 2, priority: 3 },
+      { name: 'P4', arrivalTime: 3, burstTime: 5, priority: 2 },
+    ];
+    nextId = 1;
+    onChange(defaults.map((d, i) => ({
+      ...d,
+      id: genId(),
+      color: getProcessColor(i),
+      queueId: queueOptions?.[i % (queueOptions?.length ?? 1)]?.id,
+    })));
+  }, [onChange, queueOptions]);
+
+  return (
+    <div className="card">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-base">📋</span>
+          <span className="text-text-primary font-semibold text-sm">Danh sách tiến trình</span>
+          <span className="bg-accent-purple/20 text-accent-purple rounded-full text-xs px-2 py-0.5 font-medium">
+            {processes.length}/10
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="btn-ghost text-xs" onClick={loadDefault}>
+            Mẫu mặc định
+          </button>
+          <button
+            className="btn-primary text-xs py-1.5"
+            onClick={addProcess}
+            disabled={processes.length >= 10}
+          >
+            + Thêm tiến trình
+          </button>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-text-muted text-xs border-b border-bg-border">
+              <th className="text-left pb-2 pr-4 font-medium w-16">Tiến trình</th>
+              <th className="text-left pb-2 pr-4 font-medium">Tên</th>
+              <th className="text-left pb-2 pr-4 font-medium">Đến (AT)</th>
+              <th className="text-left pb-2 pr-4 font-medium">Burst (BT)</th>
+              {showPriority && <th className="text-left pb-2 pr-4 font-medium">Ưu tiên</th>}
+              {showQueue && <th className="text-left pb-2 pr-4 font-medium">Hàng đợi</th>}
+              <th className="pb-2 w-8" />
+            </tr>
+          </thead>
+          <tbody>
+            {processes.map((p, i) => (
+              <tr key={p.id} className="border-b border-bg-border/50 hover:bg-bg-hover/50 transition-colors">
+                <td className="py-2 pr-4">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: p.color }} />
+                    <span className="text-text-muted font-mono text-xs">#{i + 1}</span>
+                  </div>
+                </td>
+                <td className="py-2 pr-4">
+                  <input
+                    className="input-dark w-24"
+                    value={p.name}
+                    maxLength={8}
+                    onChange={(e) => updateProcess(p.id, 'name', e.target.value)}
+                  />
+                </td>
+                <td className="py-2 pr-4">
+                  <input
+                    className="input-dark w-20 font-mono"
+                    type="number"
+                    min={0}
+                    value={p.arrivalTime}
+                    onChange={(e) => updateProcess(p.id, 'arrivalTime', Math.max(0, parseInt(e.target.value) || 0))}
+                  />
+                </td>
+                <td className="py-2 pr-4">
+                  <input
+                    className="input-dark w-20 font-mono"
+                    type="number"
+                    min={1}
+                    value={p.burstTime}
+                    onChange={(e) => updateProcess(p.id, 'burstTime', Math.max(1, parseInt(e.target.value) || 1))}
+                  />
+                </td>
+                {showPriority && (
+                  <td className="py-2 pr-4">
+                    <input
+                      className="input-dark w-20 font-mono"
+                      type="number"
+                      min={1}
+                      value={p.priority ?? 1}
+                      onChange={(e) => updateProcess(p.id, 'priority', Math.max(1, parseInt(e.target.value) || 1))}
+                    />
+                  </td>
+                )}
+                {showQueue && queueOptions && (
+                  <td className="py-2 pr-4">
+                    <select
+                      className="input-dark"
+                      value={p.queueId ?? queueOptions[0]?.id}
+                      onChange={(e) => updateProcess(p.id, 'queueId', e.target.value)}
+                    >
+                      {queueOptions.map((q) => (
+                        <option key={q.id} value={q.id}>{q.name}</option>
+                      ))}
+                    </select>
+                  </td>
+                )}
+                <td className="py-2">
+                  <button
+                    onClick={() => removeProcess(p.id)}
+                    disabled={processes.length <= 1}
+                    className="text-text-muted hover:text-red-400 transition-colors disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed p-1"
+                    title="Xóa tiến trình"
+                  >
+                    🗑
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {processes.length === 0 && (
+          <div className="text-center py-8 text-text-muted text-sm">
+            Chưa có tiến trình nào. Nhấn "+ Thêm tiến trình" hoặc "Mẫu mặc định".
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  background-color: #0d0f14;
+  color: #e2e8f0;
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@layer components {
+  .input-dark {
+    @apply bg-bg-tertiary border border-bg-border text-text-primary rounded-md px-3 py-1.5 text-sm w-full
+      focus:outline-none focus:ring-1 focus:ring-accent-purple focus:border-accent-purple
+      transition-colors placeholder:text-text-muted;
+  }
+
+  .btn-primary {
+    @apply bg-accent-purple hover:bg-accent-purple-dim text-white font-medium px-4 py-2 rounded-lg text-sm
+      transition-all duration-150 active:scale-95 flex items-center gap-2 cursor-pointer
+      disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100;
+  }
+
+  .btn-ghost {
+    @apply text-text-secondary hover:text-text-primary hover:bg-bg-hover px-3 py-1.5 rounded-md text-sm
+      transition-all duration-150 cursor-pointer flex items-center gap-1.5;
+  }
+
+  .card {
+    @apply bg-bg-card border border-bg-border rounded-xl p-5;
+  }
+
+  .badge-good {
+    @apply bg-emerald-500/20 text-emerald-400 rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+  .badge-avg {
+    @apply bg-yellow-500/20 text-yellow-400 rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+  .badge-poor {
+    @apply bg-red-500/20 text-red-400 rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2f3f; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3f4f; }
