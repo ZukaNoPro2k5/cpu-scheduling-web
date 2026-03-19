@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import { Process, getProcessColor } from '../../algorithms/types';
 
 interface NumericInputProps {
@@ -9,28 +9,33 @@ interface NumericInputProps {
 }
 
 function NumericInput({ value, min, className, onChange }: NumericInputProps) {
-  const [draft, setDraft] = useState(String(value));
-  const [focused, setFocused] = useState(false);
+  const ref = useRef<HTMLInputElement>(null);
+  const focusedRef = useRef(false);
 
+  // Sync external value changes only when not focused
   useEffect(() => {
-    if (!focused) setDraft(String(value));
-  }, [value, focused]);
+    if (!focusedRef.current && ref.current) {
+      ref.current.value = String(value);
+    }
+  }, [value]);
 
   const commit = () => {
-    const parsed = Math.max(min, parseInt(draft) || min);
-    setDraft(String(parsed));
+    if (!ref.current) return;
+    const parsed = Math.max(min, parseInt(ref.current.value) || min);
+    ref.current.value = String(parsed);
     onChange(parsed);
   };
 
   return (
     <input
+      ref={ref}
       type="number"
+      min={min}
       className={className}
-      value={draft}
-      onFocus={(e) => { setFocused(true); setTimeout(() => e.target.select(), 0); }}
-      onBlur={() => { setFocused(false); commit(); }}
+      defaultValue={value}
+      onFocus={(e) => { focusedRef.current = true; setTimeout(() => e.target.select(), 0); }}
+      onBlur={() => { focusedRef.current = false; commit(); }}
       onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-      onChange={(e) => setDraft(e.target.value)}
     />
   );
 }
