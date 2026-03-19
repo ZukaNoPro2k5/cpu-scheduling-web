@@ -97,15 +97,8 @@ export function AlgorithmPage({ algorithmId, onDirtyChange }: AlgorithmPageProps
     'priority-p': 'Priority P', rr: 'Round Robin', mlq: 'MLQ', mlfq: 'MLFQ',
   };
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
-      e.preventDefault();
-      compute();
-    }
-  }, [compute]);
-
   return (
-    <div className="max-w-6xl mx-auto px-5 py-6 pb-40 space-y-5" onKeyDown={handleKeyDown}>
+    <div className="max-w-6xl mx-auto px-5 py-6 pb-40 space-y-5">
       {/* MLQ Config */}
       {isMLQ && <MLQConfig queues={mlqQueues} onChange={handleMLQChange} />}
 

@@ -109,20 +109,24 @@ export function ProcessTable({ processes, onChange, showPriority = false, queueO
                 <td className="py-2 pr-4">
                   <input
                     className="input-dark w-20 font-mono"
-                    type="number"
-                    min={0}
-                    value={p.arrivalTime}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={String(p.arrivalTime)}
                     onFocus={(e) => e.target.select()}
+                    onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
                     onChange={(e) => updateProcess(p.id, 'arrivalTime', Math.max(0, parseInt(e.target.value) || 0))}
                   />
                 </td>
                 <td className="py-2 pr-4">
                   <input
                     className="input-dark w-20 font-mono"
-                    type="number"
-                    min={1}
-                    value={p.burstTime}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={String(p.burstTime)}
                     onFocus={(e) => e.target.select()}
+                    onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
                     onChange={(e) => updateProcess(p.id, 'burstTime', Math.max(1, parseInt(e.target.value) || 1))}
                   />
                 </td>
@@ -130,10 +134,12 @@ export function ProcessTable({ processes, onChange, showPriority = false, queueO
                   <td className="py-2 pr-4">
                     <input
                       className="input-dark w-20 font-mono"
-                      type="number"
-                      min={1}
-                      value={p.priority ?? 1}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      value={String(p.priority ?? 1)}
                       onFocus={(e) => e.target.select()}
+                      onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
                       onChange={(e) => updateProcess(p.id, 'priority', Math.max(1, parseInt(e.target.value) || 1))}
                     />
                   </td>
