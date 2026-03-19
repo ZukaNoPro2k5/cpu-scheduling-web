@@ -46,6 +46,7 @@ export function AlgorithmPage({ algorithmId, onDirtyChange, onProcessCountChange
   const [mlqQueues, setMlqQueues] = useState<MLQueueConfig[]>(DEFAULT_MLQ_QUEUES);
   const [mlfqLevels, setMlfqLevels] = useState<MLFQueueLevel[]>(defaultLevels(4));
   const [error, setError] = useState<string | null>(null);
+  const [priorityLowIsHigh, setPriorityLowIsHigh] = useState(true);
   const resultsRef = useRef<HTMLDivElement>(null);
   const prevAlgRef = useRef(algorithmId);
 
@@ -92,8 +93,8 @@ export function AlgorithmPage({ algorithmId, onDirtyChange, onProcessCountChange
         case 'fcfs':      res = fcfs(processes); break;
         case 'sjf':       res = sjfNonPreemptive(processes); break;
         case 'srtf':      res = srtf(processes); break;
-        case 'priority':  res = priorityNonPreemptive(processes); break;
-        case 'priority-p':res = priorityPreemptive(processes); break;
+        case 'priority':  res = priorityNonPreemptive(processes, priorityLowIsHigh); break;
+        case 'priority-p':res = priorityPreemptive(processes, priorityLowIsHigh); break;
         case 'rr':        res = roundRobin(processes, timeQuantum); break;
         case 'mlq':       res = multilevelQueue(processes, mlqQueues); break;
         case 'mlfq':      res = multilevelFeedbackQueue(processes, mlfqLevels); break;
@@ -107,7 +108,7 @@ export function AlgorithmPage({ algorithmId, onDirtyChange, onProcessCountChange
       setError('Có lỗi xảy ra khi tính toán. Vui lòng kiểm tra dữ liệu đầu vào.');
       console.error(e);
     }
-  }, [algorithmId, processes, timeQuantum, mlqQueues, mlfqLevels, onDirtyChange]);
+  }, [algorithmId, processes, timeQuantum, mlqQueues, mlfqLevels, priorityLowIsHigh, onDirtyChange]);
 
   const algLabels: Record<AlgorithmId, string> = {
     fcfs: 'FCFS', sjf: 'SJF', srtf: 'SRTF', priority: 'Priority NP',
@@ -125,7 +126,7 @@ export function AlgorithmPage({ algorithmId, onDirtyChange, onProcessCountChange
       {/* RR quantum */}
       {isRR && (
         <div className="card flex items-center gap-4">
-          <span className="text-text-muted text-sm font-medium">Time Quantum:</span>
+          <span className="text-text-muted text-sm font-medium">Lượng thời gian (Quantum):</span>
           <input
             className="input-dark w-24 font-mono text-center"
             type="number"
@@ -137,11 +138,34 @@ export function AlgorithmPage({ algorithmId, onDirtyChange, onProcessCountChange
         </div>
       )}
 
+      {/* Priority direction */}
+      {showPriority && (
+        <div className="card flex items-center gap-4">
+          <span className="text-text-muted text-sm font-medium">Cơ chế ưu tiên:</span>
+          <div className="flex gap-2">
+            {[true, false].map((lowIsHigh) => (
+              <button
+                key={String(lowIsHigh)}
+                onClick={() => { setPriorityLowIsHigh(lowIsHigh); setIsDirty(true); onDirtyChange?.(true); }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  priorityLowIsHigh === lowIsHigh
+                    ? 'bg-accent-purple/20 text-accent-purple border border-accent-purple/40'
+                    : 'bg-bg-tertiary text-text-muted border border-bg-border hover:bg-bg-hover'
+                }`}
+              >
+                {lowIsHigh ? '↓ Số nhỏ = Ưu tiên cao' : '↑ Số lớn = Ưu tiên cao'}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Process Table */}
       <ProcessTable
         processes={processes}
         onChange={handleProcessChange}
         showPriority={showPriority}
+        priorityLowIsHigh={priorityLowIsHigh}
         showQueue={showQueue}
         queueOptions={showQueue ? mlqQueues.map((q) => ({ id: q.id, name: q.name })) : undefined}
       />

@@ -57,7 +57,7 @@ export function AlgorithmTabs({ processCount, isDirty }: AlgorithmTabsProps) {
           className="w-8 h-8 rounded-xl flex items-center justify-center text-sm"
           style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', boxShadow: '0 3px 10px rgba(99,102,241,0.45)' }}
         >
-          ⚙
+          🖥
         </div>
         <div>
           <div className="text-sm font-bold text-white">CPU Scheduling Visualizer</div>

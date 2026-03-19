@@ -17,10 +17,10 @@ export function MetricsPanel({ metrics, summary }: MetricsProps) {
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Avg WT', value: fmt(avgWt), sub: 'Trung bình thời gian chờ' },
-          { label: 'Avg TAT', value: fmt(avgTat), sub: 'Turnaround time trung bình' },
-          { label: 'Avg RT', value: fmt(avgRt), sub: 'Response time trung bình' },
-          { label: 'Throughput', value: fmt(summary.throughput), sub: 'Tiến trình / đơn vị thời gian' },
+          { label: 'TB T.gian chờ (WT)', value: fmt(avgWt), sub: 'Trung bình thời gian chờ' },
+          { label: 'TB T.gian hoàn thành (TAT)', value: fmt(avgTat), sub: 'Trung bình thời gian lưu chuyển' },
+          { label: 'TB T.gian đáp ứng (RT)', value: fmt(avgRt), sub: 'Trung bình thời gian phản hồi' },
+          { label: 'Thông lượng', value: fmt(summary.throughput), sub: 'Tiến trình / đơn vị thời gian' },
         ].map((card) => (
           <div key={card.label} className="card text-center hover:border-accent-purple/30 transition-colors duration-200">
             <div className="text-text-muted text-xs mb-1">{card.label}</div>
@@ -43,23 +43,23 @@ export function MetricsPanel({ metrics, summary }: MetricsProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-sm table-fixed">
             <colgroup>
-              <col className="w-32" />
-              <col className="w-16" />
-              <col className="w-16" />
-              <col className="w-16" />
+              <col className="w-28" />
               <col className="w-20" />
               <col className="w-20" />
               <col className="w-20" />
+              <col className="w-20" />
+              <col className="w-24" />
+              <col className="w-24" />
             </colgroup>
             <thead>
               <tr className="text-text-muted text-xs border-b border-bg-border uppercase tracking-wide">
                 <th className="text-left pb-3 font-medium">Tiến trình</th>
-                <th className="text-center pb-3 font-medium">AT</th>
-                <th className="text-center pb-3 font-medium">BT</th>
-                <th className="text-center pb-3 font-medium">CT</th>
-                <th className="text-center pb-3 font-medium">WT</th>
-                <th className="text-center pb-3 font-medium">TAT</th>
-                <th className="text-center pb-3 font-medium">RT</th>
+                <th className="text-center pb-3 font-medium">T.gian đến</th>
+                <th className="text-center pb-3 font-medium">T.gian chạy</th>
+                <th className="text-center pb-3 font-medium">T.gian k.thúc</th>
+                <th className="text-center pb-3 font-medium">T.gian chờ</th>
+                <th className="text-center pb-3 font-medium">T.gian lưu chuyển</th>
+                <th className="text-center pb-3 font-medium">T.gian đáp ứng</th>
               </tr>
             </thead>
             <tbody>
@@ -85,7 +85,7 @@ export function MetricsPanel({ metrics, summary }: MetricsProps) {
               ))}
               {/* Average row */}
               <tr className="bg-bg-tertiary/50">
-                <td className="py-2.5 font-semibold text-text-primary text-xs uppercase tracking-wide">Trung bình</td>
+                <td className="py-2.5 font-semibold text-text-primary text-xs uppercase tracking-wide">TB</td>
                 <td className="py-2.5 text-center text-text-muted">—</td>
                 <td className="py-2.5 text-center text-text-muted">—</td>
                 <td className="py-2.5 text-center text-text-muted">—</td>

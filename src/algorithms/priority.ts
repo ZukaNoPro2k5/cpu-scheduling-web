@@ -1,7 +1,7 @@
 import { Process, GanttBlock, ScheduleResult, computeMetrics } from './types';
 
-// Priority Non-Preemptive (lower number = higher priority)
-export function priorityNonPreemptive(processes: Process[]): ScheduleResult {
+// Priority Non-Preemptive
+export function priorityNonPreemptive(processes: Process[], lowIsHigh = true): ScheduleResult {
   const gantt: GanttBlock[] = [];
   const completionTimes = new Map<string, number>();
   const firstRunTimes = new Map<string, number>();
@@ -16,7 +16,10 @@ export function priorityNonPreemptive(processes: Process[]): ScheduleResult {
       time = next.arrivalTime;
       continue;
     }
-    available.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0) || a.arrivalTime - b.arrivalTime || a.id.localeCompare(b.id));
+    available.sort((a, b) => {
+      const pa = a.priority ?? 0, pb = b.priority ?? 0;
+      return (lowIsHigh ? pa - pb : pb - pa) || a.arrivalTime - b.arrivalTime || a.id.localeCompare(b.id);
+    });
     const p = available[0];
     remaining.splice(remaining.indexOf(p), 1);
 
@@ -32,8 +35,8 @@ export function priorityNonPreemptive(processes: Process[]): ScheduleResult {
   return { gantt, metrics, summary };
 }
 
-// Priority Preemptive (lower number = higher priority)
-export function priorityPreemptive(processes: Process[]): ScheduleResult {
+// Priority Preemptive
+export function priorityPreemptive(processes: Process[], lowIsHigh = true): ScheduleResult {
   const gantt: GanttBlock[] = [];
   const completionTimes = new Map<string, number>();
   const firstRunTimes = new Map<string, number>();
@@ -57,7 +60,10 @@ export function priorityPreemptive(processes: Process[]): ScheduleResult {
       continue;
     }
 
-    available.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0) || a.arrivalTime - b.arrivalTime || a.id.localeCompare(b.id));
+    available.sort((a, b) => {
+      const pa = a.priority ?? 0, pb = b.priority ?? 0;
+      return (lowIsHigh ? pa - pb : pb - pa) || a.arrivalTime - b.arrivalTime || a.id.localeCompare(b.id);
+    });
     const p = available[0];
 
     if (!firstRunTimes.has(p.id)) firstRunTimes.set(p.id, time);

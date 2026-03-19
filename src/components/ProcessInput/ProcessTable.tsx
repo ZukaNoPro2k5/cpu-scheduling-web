@@ -9,32 +9,33 @@ interface NumericInputProps {
 }
 
 function NumericInput({ value, min, className, onChange }: NumericInputProps) {
-  const ref = useRef<HTMLInputElement>(null);
-  const focusedRef = useRef(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const callbackRef = useRef(onChange);
+  callbackRef.current = onChange;
 
-  // Sync external value changes only when not focused
+  // Sync from parent only when input is NOT focused
   useEffect(() => {
-    if (!focusedRef.current && ref.current) {
-      ref.current.value = String(value);
+    if (inputRef.current && inputRef.current !== document.activeElement) {
+      inputRef.current.value = String(value);
     }
   }, [value]);
 
-  const commit = () => {
-    if (!ref.current) return;
-    const parsed = Math.max(min, parseInt(ref.current.value) || min);
-    ref.current.value = String(parsed);
-    onChange(parsed);
-  };
+  const commit = useCallback(() => {
+    if (!inputRef.current) return;
+    const parsed = Math.max(min, parseInt(inputRef.current.value) || min);
+    inputRef.current.value = String(parsed);
+    callbackRef.current(parsed);
+  }, [min]);
 
   return (
     <input
-      ref={ref}
+      ref={inputRef}
       type="number"
       min={min}
       className={className}
       defaultValue={value}
-      onFocus={(e) => { focusedRef.current = true; setTimeout(() => e.target.select(), 0); }}
-      onBlur={() => { focusedRef.current = false; commit(); }}
+      onFocus={(e) => setTimeout(() => e.target.select(), 0)}
+      onBlur={commit}
       onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
     />
   );
@@ -44,6 +45,7 @@ interface ProcessTableProps {
   processes: Process[];
   onChange: (processes: Process[]) => void;
   showPriority?: boolean;
+  priorityLowIsHigh?: boolean;
   queueOptions?: { id: string; name: string }[];
   showQueue?: boolean;
 }
@@ -119,11 +121,11 @@ export function ProcessTable({ processes, onChange, showPriority = false, queueO
         <table className="w-full text-sm">
           <thead>
             <tr className="text-text-muted text-xs border-b border-bg-border">
-              <th className="text-left pb-2 pr-4 font-medium w-16">Tiến trình</th>
+              <th className="text-left pb-2 pr-4 font-medium w-16">STT</th>
               <th className="text-left pb-2 pr-4 font-medium">Tên</th>
-              <th className="text-left pb-2 pr-4 font-medium">Đến (AT)</th>
-              <th className="text-left pb-2 pr-4 font-medium">Burst (BT)</th>
-              {showPriority && <th className="text-left pb-2 pr-4 font-medium">Ưu tiên</th>}
+              <th className="text-left pb-2 pr-4 font-medium">T.gian đến (AT)</th>
+              <th className="text-left pb-2 pr-4 font-medium">T.gian chạy (BT)</th>
+              {showPriority && <th className="text-left pb-2 pr-4 font-medium">Ưu tiên (Pri)</th>}
               {showQueue && <th className="text-left pb-2 pr-4 font-medium">Hàng đợi</th>}
               <th className="pb-2 w-8" />
             </tr>
