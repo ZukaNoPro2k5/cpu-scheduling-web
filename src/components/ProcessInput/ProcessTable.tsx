@@ -9,27 +9,33 @@ interface NumericInputProps {
 }
 
 function NumericInput({ value, min, className, onChange }: NumericInputProps) {
-  const [localValue, setLocalValue] = useState(String(value));
+  const [val, setVal] = useState<string | number>(value);
 
-  // Update local value if parent value changes externally
   useEffect(() => {
-    setLocalValue(String(value));
+    setVal(value);
   }, [value]);
 
-  const commit = (inputValue: string) => {
-    const raw = inputValue.trim();
-    let finalValue = value; // Default to previous safe value
-
-    if (raw !== '') {
-      const parsed = parseInt(raw);
-      if (!isNaN(parsed)) {
-        finalValue = Math.max(min, parsed);
-      }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    if (raw === '') {
+      setVal('');
+      return;
     }
     
-    setLocalValue(String(finalValue));
-    if (finalValue !== value) {
-      onChange(finalValue);
+    const parsed = parseInt(raw, 10);
+    if (!Number.isNaN(parsed)) {
+      setVal(parsed);
+      onChange(Math.max(min, parsed));
+    }
+  };
+
+  const handleBlur = () => {
+    if (val === '') {
+      setVal(value); 
+    } else {
+      const clamped = Math.max(min, Number(val));
+      setVal(clamped);
+      if (clamped !== value) onChange(clamped);
     }
   };
 
@@ -38,16 +44,10 @@ function NumericInput({ value, min, className, onChange }: NumericInputProps) {
       type="number"
       min={min}
       className={className}
-      value={localValue}
-      onChange={(e) => setLocalValue(e.target.value)}
+      value={val}
+      onChange={handleChange}
+      onBlur={handleBlur}
       onFocus={(e) => e.target.select()}
-      onBlur={(e) => commit(e.target.value)}
-      onKeyDown={(e) => { 
-        if (e.key === 'Enter') {
-          commit(e.currentTarget.value);
-          e.currentTarget.blur(); 
-        }
-      }}
     />
   );
 }
