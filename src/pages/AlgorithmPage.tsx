@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Process, ScheduleResult, MLQueueConfig, MLFQueueLevel, getProcessColor } from '../algorithms/types';
 import { ProcessTable } from '../components/ProcessInput/ProcessTable';
 import { MLQConfig } from '../components/ProcessInput/MLQConfig';
@@ -45,6 +45,7 @@ export function AlgorithmPage({ algorithmId, onDirtyChange }: AlgorithmPageProps
   const [mlqQueues, setMlqQueues] = useState<MLQueueConfig[]>(DEFAULT_MLQ_QUEUES);
   const [mlfqLevels, setMlfqLevels] = useState<MLFQueueLevel[]>(defaultLevels(4));
   const [error, setError] = useState<string | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const showPriority = ['priority', 'priority-p'].includes(algorithmId);
   const showQueue = algorithmId === 'mlq';
@@ -84,6 +85,7 @@ export function AlgorithmPage({ algorithmId, onDirtyChange }: AlgorithmPageProps
       setResult(res);
       setIsDirty(false);
       onDirtyChange?.(false);
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     } catch (e) {
       setError('Có lỗi xảy ra khi tính toán. Vui lòng kiểm tra dữ liệu đầu vào.');
       console.error(e);
@@ -135,20 +137,67 @@ export function AlgorithmPage({ algorithmId, onDirtyChange }: AlgorithmPageProps
       )}
 
       {/* Compute button */}
-      <div className="flex justify-center">
-        <button className="btn-primary px-8 py-3 text-base rounded-xl shadow-lg shadow-accent-purple/20" onClick={compute}>
-          <span>↻</span>
-          <span>Cập nhật kết quả — {algLabels[algorithmId]}</span>
-          {isDirty && <span className="w-2 h-2 rounded-full bg-yellow-400 ml-1" />}
-        </button>
-      </div>
+      {(() => {
+        const hasResult = result !== null;
+        const needsUpdate = hasResult && isDirty;
+        const isDone = hasResult && !isDirty;
+
+        let bg: string, border: string, color: string, anim: string | undefined, label: string, icon: string;
+        if (isDone) {
+          bg = 'rgba(255,255,255,0.03)';
+          border = '1px solid rgba(255,255,255,0.07)';
+          color = '#475569';
+          anim = undefined;
+          label = `Kết quả — ${algLabels[algorithmId]}`;
+          icon = '✓';
+        } else if (needsUpdate) {
+          bg = 'rgba(251,191,36,0.1)';
+          border = '1px solid rgba(251,191,36,0.35)';
+          color = '#fcd34d';
+          anim = 'glow-pulse-amber 2s ease-in-out infinite';
+          label = `Cập nhật kết quả — ${algLabels[algorithmId]}`;
+          icon = '↻';
+        } else {
+          bg = 'rgba(99,102,241,0.15)';
+          border = '1px solid rgba(99,102,241,0.4)';
+          color = '#a5b4fc';
+          anim = 'glow-pulse 2s ease-in-out infinite';
+          label = `Tính kết quả — ${algLabels[algorithmId]}`;
+          icon = '→';
+        }
+
+        return (
+          <div className="flex items-center gap-4">
+            <div className="flex-1 h-px bg-bg-border" />
+            <button
+              className="calc-btn"
+              disabled={isDone}
+              onClick={compute}
+              style={{ background: bg, border, color, animation: anim }}
+            >
+              <span>{icon}</span>
+              <span>{label}</span>
+              {!isDone && (
+                <span
+                  className="w-1.5 h-1.5 rounded-full ml-1"
+                  style={{
+                    background: needsUpdate ? '#fbbf24' : '#818cf8',
+                    animation: 'dot-pulse 2s ease-in-out infinite',
+                  }}
+                />
+              )}
+            </button>
+            <div className="flex-1 h-px bg-bg-border" />
+          </div>
+        );
+      })()}
 
       {/* Results */}
       {result && (
-        <>
+        <div ref={resultsRef} className="space-y-5">
           <GanttChart gantt={result.gantt} totalTime={result.summary.totalTime} />
           <MetricsPanel metrics={result.metrics} summary={result.summary} />
-        </>
+        </div>
       )}
     </div>
   );

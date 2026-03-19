@@ -29,11 +29,13 @@ export function GanttChart({ gantt, totalTime }: GanttChartProps) {
     }
   }
 
-  // Calculate tick marks for x-axis
-  const step = totalTime <= 20 ? 1 : totalTime <= 50 ? 5 : 10;
-  const ticks: number[] = [];
-  for (let t = 0; t <= totalTime; t += step) ticks.push(t);
-  if (ticks[ticks.length - 1] !== totalTime) ticks.push(totalTime);
+  // Collect all boundary times (block transitions) — deduplicated and sorted
+  const boundarySet = new Set<number>();
+  for (const b of merged) {
+    boundarySet.add(b.startTime);
+    boundarySet.add(b.endTime);
+  }
+  const boundaries = Array.from(boundarySet).sort((a, b) => a - b);
 
   const contextSwitches = merged.filter((b) => b.processId !== null).length - 1;
 
@@ -50,7 +52,10 @@ export function GanttChart({ gantt, totalTime }: GanttChartProps) {
         <div className="flex items-center gap-2 flex-wrap justify-end">
           {legendItems.map((item) => (
             <div key={item.processId} className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: item.color }} />
+              <span
+                className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
+                style={{ background: item.color, boxShadow: `0 0 4px ${item.color}80` }}
+              />
               <span className="text-xs text-text-secondary">{item.processName}</span>
             </div>
           ))}
@@ -59,7 +64,7 @@ export function GanttChart({ gantt, totalTime }: GanttChartProps) {
 
       {/* Gantt bars */}
       <div className="overflow-x-auto pb-2">
-        <div style={{ minWidth: `${Math.max(totalTime * 36, 400)}px` }}>
+        <div style={{ minWidth: `${Math.max(totalTime * 36, 400)}px`, paddingLeft: 6, paddingRight: 6 }}>
           {/* Bars */}
           <div className="flex h-12 rounded-lg overflow-hidden">
             {merged.map((block, i) => {
@@ -72,7 +77,7 @@ export function GanttChart({ gantt, totalTime }: GanttChartProps) {
                     width: `${width}%`,
                     background: block.processId
                       ? `linear-gradient(135deg, ${block.color}cc, ${block.color})`
-                      : '#1e2230',
+                      : 'repeating-linear-gradient(45deg, #1e293b, #1e293b 3px, #0f172a 3px, #0f172a 6px)',
                     borderRight: i < merged.length - 1 ? '1px solid rgba(0,0,0,0.3)' : undefined,
                   }}
                   title={`${block.processName}: ${block.startTime} → ${block.endTime}`}
@@ -90,18 +95,27 @@ export function GanttChart({ gantt, totalTime }: GanttChartProps) {
             })}
           </div>
 
-          {/* X-axis ticks */}
+          {/* X-axis: block boundary ticks */}
           <div className="relative h-5 mt-1">
-            {ticks.map((t) => (
-              <div
-                key={t}
-                className="absolute flex flex-col items-center"
-                style={{ left: `${(t / totalTime) * 100}%`, transform: 'translateX(-50%)' }}
-              >
-                <div className="w-px h-1.5 bg-bg-border" />
-                <span className="text-text-muted font-mono" style={{ fontSize: '10px' }}>{t}</span>
-              </div>
-            ))}
+            {boundaries.map((t) => {
+              const pct = (t / totalTime) * 100;
+              // First tick aligns left, last tick aligns right, middle ticks center
+              const isFirst = t === 0;
+              const isLast = t === totalTime;
+              return (
+                <div
+                  key={t}
+                  className="absolute flex flex-col items-center"
+                  style={{
+                    left: `${pct}%`,
+                    transform: isFirst ? 'translateX(0)' : isLast ? 'translateX(-100%)' : 'translateX(-50%)',
+                  }}
+                >
+                  <div className="w-px h-1.5 bg-bg-border" />
+                  <span className="text-text-muted font-mono" style={{ fontSize: '10px' }}>{t}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

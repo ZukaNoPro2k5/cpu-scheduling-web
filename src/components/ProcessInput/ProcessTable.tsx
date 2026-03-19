@@ -94,7 +94,7 @@ export function ProcessTable({ processes, onChange, showPriority = false, queueO
               <tr key={p.id} className="border-b border-bg-border/50 hover:bg-bg-hover/50 transition-colors">
                 <td className="py-2 pr-4">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: p.color }} />
+                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: p.color, boxShadow: `0 0 4px ${p.color}80` }} />
                     <span className="text-text-muted font-mono text-xs">#{i + 1}</span>
                   </div>
                 </td>

@@ -51,7 +51,7 @@ export function srtf(processes: Process[]): ScheduleResult {
     if (available.length === 0) {
       const nextArrival = processes
         .filter((p) => (remaining.get(p.id) ?? 0) > 0)
-        .reduce((a, b) => a.arrivalTime < b.arrivalTime ? a : b, processes[0]);
+        .reduce((a, b) => a.arrivalTime < b.arrivalTime ? a : b);
       if (lastProcess !== null) {
         const last = gantt[gantt.length - 1];
         if (last.processId === null) { last.endTime = nextArrival.arrivalTime; }
