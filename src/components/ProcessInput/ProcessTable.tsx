@@ -38,10 +38,10 @@ export function ProcessTable({ processes, onChange, showPriority = false, queueO
 
   const loadDefault = useCallback(() => {
     const defaults: Omit<Process, 'id' | 'color'>[] = [
-      { name: 'P1', arrivalTime: 0, burstTime: 6, priority: 2 },
-      { name: 'P2', arrivalTime: 1, burstTime: 4, priority: 1 },
-      { name: 'P3', arrivalTime: 2, burstTime: 2, priority: 3 },
-      { name: 'P4', arrivalTime: 3, burstTime: 5, priority: 2 },
+      { name: 'P1', arrivalTime: 0, burstTime: 1, priority: 1 },
+      { name: 'P2', arrivalTime: 1, burstTime: 1, priority: 1 },
+      { name: 'P3', arrivalTime: 2, burstTime: 1, priority: 1 },
+      { name: 'P4', arrivalTime: 3, burstTime: 1, priority: 1 },
     ];
     nextId = 1;
     onChange(defaults.map((d, i) => ({
@@ -112,6 +112,7 @@ export function ProcessTable({ processes, onChange, showPriority = false, queueO
                     type="number"
                     min={0}
                     value={p.arrivalTime}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => updateProcess(p.id, 'arrivalTime', Math.max(0, parseInt(e.target.value) || 0))}
                   />
                 </td>
@@ -121,6 +122,7 @@ export function ProcessTable({ processes, onChange, showPriority = false, queueO
                     type="number"
                     min={1}
                     value={p.burstTime}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => updateProcess(p.id, 'burstTime', Math.max(1, parseInt(e.target.value) || 1))}
                   />
                 </td>
@@ -131,6 +133,7 @@ export function ProcessTable({ processes, onChange, showPriority = false, queueO
                       type="number"
                       min={1}
                       value={p.priority ?? 1}
+                      onFocus={(e) => e.target.select()}
                       onChange={(e) => updateProcess(p.id, 'priority', Math.max(1, parseInt(e.target.value) || 1))}
                     />
                   </td>
