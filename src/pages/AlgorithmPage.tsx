@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Process, ScheduleResult, MLQueueConfig, MLFQueueLevel, getProcessColor } from '../algorithms/types';
 import { ProcessTable } from '../components/ProcessInput/ProcessTable';
 import { MLQConfig } from '../components/ProcessInput/MLQConfig';
@@ -18,6 +18,7 @@ export type AlgorithmId = 'fcfs' | 'sjf' | 'srtf' | 'priority' | 'priority-p' | 
 interface AlgorithmPageProps {
   algorithmId: AlgorithmId;
   onDirtyChange?: (dirty: boolean) => void;
+  onProcessCountChange?: (count: number) => void;
 }
 
 const DEFAULT_PROCESSES: Process[] = [
@@ -32,7 +33,7 @@ const DEFAULT_MLQ_QUEUES: MLQueueConfig[] = [
   { id: 'q2', name: 'Hàng đợi 2 (Người dùng)', algorithm: 'FCFS' },
 ];
 
-export function AlgorithmPage({ algorithmId, onDirtyChange }: AlgorithmPageProps) {
+export function AlgorithmPage({ algorithmId, onDirtyChange, onProcessCountChange }: AlgorithmPageProps) {
   const [processes, setProcesses] = useState<Process[]>(() =>
     DEFAULT_PROCESSES.map((p, i) => ({
       ...p,
@@ -46,6 +47,22 @@ export function AlgorithmPage({ algorithmId, onDirtyChange }: AlgorithmPageProps
   const [mlfqLevels, setMlfqLevels] = useState<MLFQueueLevel[]>(defaultLevels(4));
   const [error, setError] = useState<string | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const prevAlgRef = useRef(algorithmId);
+
+  // Clear result and mark dirty when switching algorithms
+  useEffect(() => {
+    if (prevAlgRef.current !== algorithmId) {
+      prevAlgRef.current = algorithmId;
+      setResult(null);
+      setIsDirty(true);
+      onDirtyChange?.(true);
+    }
+  }, [algorithmId, onDirtyChange]);
+
+  // Sync process count to parent
+  useEffect(() => {
+    onProcessCountChange?.(processes.length);
+  }, [processes.length, onProcessCountChange]);
 
   const showPriority = ['priority', 'priority-p'].includes(algorithmId);
   const showQueue = algorithmId === 'mlq';

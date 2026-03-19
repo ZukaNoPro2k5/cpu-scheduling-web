@@ -1,5 +1,39 @@
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { Process, getProcessColor } from '../../algorithms/types';
+
+interface NumericInputProps {
+  value: number;
+  min: number;
+  className?: string;
+  onChange: (v: number) => void;
+}
+
+function NumericInput({ value, min, className, onChange }: NumericInputProps) {
+  const [draft, setDraft] = useState(String(value));
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (!focused) setDraft(String(value));
+  }, [value, focused]);
+
+  const commit = () => {
+    const parsed = Math.max(min, parseInt(draft) || min);
+    setDraft(String(parsed));
+    onChange(parsed);
+  };
+
+  return (
+    <input
+      type="number"
+      className={className}
+      value={draft}
+      onFocus={(e) => { setFocused(true); setTimeout(() => e.target.select(), 0); }}
+      onBlur={() => { setFocused(false); commit(); }}
+      onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+      onChange={(e) => setDraft(e.target.value)}
+    />
+  );
+}
 
 interface ProcessTableProps {
   processes: Process[];
@@ -107,40 +141,28 @@ export function ProcessTable({ processes, onChange, showPriority = false, queueO
                   />
                 </td>
                 <td className="py-2 pr-4">
-                  <input
+                  <NumericInput
                     className="input-dark w-20 font-mono"
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={String(p.arrivalTime)}
-                    onFocus={(e) => e.target.select()}
-                    onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-                    onChange={(e) => updateProcess(p.id, 'arrivalTime', Math.max(0, parseInt(e.target.value) || 0))}
+                    value={p.arrivalTime}
+                    min={0}
+                    onChange={(v) => updateProcess(p.id, 'arrivalTime', v)}
                   />
                 </td>
                 <td className="py-2 pr-4">
-                  <input
+                  <NumericInput
                     className="input-dark w-20 font-mono"
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={String(p.burstTime)}
-                    onFocus={(e) => e.target.select()}
-                    onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-                    onChange={(e) => updateProcess(p.id, 'burstTime', Math.max(1, parseInt(e.target.value) || 1))}
+                    value={p.burstTime}
+                    min={1}
+                    onChange={(v) => updateProcess(p.id, 'burstTime', v)}
                   />
                 </td>
                 {showPriority && (
                   <td className="py-2 pr-4">
-                    <input
+                    <NumericInput
                       className="input-dark w-20 font-mono"
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      value={String(p.priority ?? 1)}
-                      onFocus={(e) => e.target.select()}
-                      onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-                      onChange={(e) => updateProcess(p.id, 'priority', Math.max(1, parseInt(e.target.value) || 1))}
+                      value={p.priority ?? 1}
+                      min={1}
+                      onChange={(v) => updateProcess(p.id, 'priority', v)}
                     />
                   </td>
                 )}
