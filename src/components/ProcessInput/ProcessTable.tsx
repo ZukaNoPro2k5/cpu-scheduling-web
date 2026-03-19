@@ -48,7 +48,7 @@ interface ProcessTableProps {
   showQueue?: boolean;
 }
 
-let nextId = 1;
+let nextId = 100;
 function genId() { return `p${nextId++}`; }
 
 export function ProcessTable({ processes, onChange, showPriority = false, queueOptions, showQueue = false }: ProcessTableProps) {
