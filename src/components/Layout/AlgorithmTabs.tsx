@@ -54,10 +54,21 @@ export function AlgorithmTabs({ processCount, isDirty }: AlgorithmTabsProps) {
         style={{ background: 'rgba(10,22,40,0.92)', backdropFilter: 'blur(14px)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
       >
         <div
-          className="w-8 h-8 rounded-xl flex items-center justify-center text-sm"
+          className="w-10 h-10 rounded-xl flex items-center justify-center text-sm"
           style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', boxShadow: '0 3px 10px rgba(99,102,241,0.45)' }}
         >
-          🖥
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+            <rect x="9" y="9" width="6" height="6"></rect>
+            <line x1="9" y1="1" x2="9" y2="4"></line>
+            <line x1="15" y1="1" x2="15" y2="4"></line>
+            <line x1="9" y1="20" x2="9" y2="23"></line>
+            <line x1="15" y1="20" x2="15" y2="23"></line>
+            <line x1="20" y1="9" x2="23" y2="9"></line>
+            <line x1="20" y1="14" x2="23" y2="14"></line>
+            <line x1="1" y1="9" x2="4" y2="9"></line>
+            <line x1="1" y1="14" x2="4" y2="14"></line>
+          </svg>
         </div>
         <div>
           <div className="text-sm font-bold text-white">CPU Scheduling Visualizer</div>

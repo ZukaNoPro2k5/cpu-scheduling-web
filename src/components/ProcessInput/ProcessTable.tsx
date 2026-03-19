@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { Process, getProcessColor } from '../../algorithms/types';
 
 interface NumericInputProps {
@@ -9,32 +9,38 @@ interface NumericInputProps {
 }
 
 function NumericInput({ value, min, className, onChange }: NumericInputProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const callbackRef = useRef(onChange);
-  callbackRef.current = onChange;
+  const [localValue, setLocalValue] = useState(String(value));
 
-  // Sync from parent only when input is NOT focused
+  // Update local value if parent value changes externally
   useEffect(() => {
-    if (inputRef.current && inputRef.current !== document.activeElement) {
-      inputRef.current.value = String(value);
-    }
+    setLocalValue(String(value));
   }, [value]);
 
-  const commit = useCallback(() => {
-    if (!inputRef.current) return;
-    const parsed = Math.max(min, parseInt(inputRef.current.value) || min);
-    inputRef.current.value = String(parsed);
-    callbackRef.current(parsed);
-  }, [min]);
+  const commit = () => {
+    const raw = localValue.trim();
+    let finalValue = value; // Default to previous safe value
+
+    if (raw !== '') {
+      const parsed = parseInt(raw);
+      if (!isNaN(parsed)) {
+        finalValue = Math.max(min, parsed);
+      }
+    }
+    
+    setLocalValue(String(finalValue));
+    if (finalValue !== value) {
+      onChange(finalValue);
+    }
+  };
 
   return (
     <input
-      ref={inputRef}
       type="number"
       min={min}
       className={className}
-      defaultValue={value}
-      onFocus={(e) => setTimeout(() => e.target.select(), 0)}
+      value={localValue}
+      onChange={(e) => setLocalValue(e.target.value)}
+      onFocus={(e) => e.target.select()}
       onBlur={commit}
       onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
     />
