@@ -21,9 +21,9 @@ const ALGORITHMS: AlgorithmTab[] = [
 ];
 
 const GROUP_LABELS: Record<string, string> = {
-  nonpreemptive: 'Không chiếm quyền',
-  preemptive: 'Chiếm quyền',
-  advanced: 'Nâng cao',
+  nonpreemptive: 'Không cho phép dừng',
+  preemptive: 'Cho phép dừng',
+  advanced: 'Đa cấp',
 };
 
 const GROUP_COLORS: Record<string, { text: string; dot: string; activeBg: string; activeBorder: string; underline: string }> = {

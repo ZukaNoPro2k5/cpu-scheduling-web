@@ -17,15 +17,14 @@ export function MetricsPanel({ metrics, summary }: MetricsProps) {
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'TB T.gian chờ (WT)', value: fmt(avgWt), sub: 'Trung bình thời gian chờ' },
-          { label: 'TB T.gian hoàn thành (TAT)', value: fmt(avgTat), sub: 'Trung bình thời gian lưu chuyển' },
-          { label: 'TB T.gian đáp ứng (RT)', value: fmt(avgRt), sub: 'Trung bình thời gian phản hồi' },
-          { label: 'Thông lượng', value: fmt(summary.throughput), sub: 'Tiến trình / đơn vị thời gian' },
+          { label: 'TB T.gian chờ (WT)', value: fmt(avgWt)},
+          { label: 'TB T.gian hoàn thành (TAT)', value: fmt(avgTat)},
+          { label: 'TB T.gian phản hồi (RT)', value: fmt(avgRt)},
+          { label: 'Thông lượng', value: fmt(summary.throughput)},
         ].map((card) => (
           <div key={card.label} className="card text-center hover:border-accent-purple/30 transition-colors duration-200">
             <div className="text-text-muted text-xs mb-1">{card.label}</div>
             <div className="text-2xl font-bold text-accent-cyan font-mono">{card.value}</div>
-            <div className="text-text-muted text-xs mt-1">{card.sub}</div>
           </div>
         ))}
       </div>
@@ -58,8 +57,8 @@ export function MetricsPanel({ metrics, summary }: MetricsProps) {
                 <th className="text-center pb-3 font-medium">T.gian chạy</th>
                 <th className="text-center pb-3 font-medium">T.gian k.thúc</th>
                 <th className="text-center pb-3 font-medium">T.gian chờ</th>
-                <th className="text-center pb-3 font-medium">T.gian lưu chuyển</th>
-                <th className="text-center pb-3 font-medium">T.gian đáp ứng</th>
+                <th className="text-center pb-3 font-medium">T.gian hoàn thành</th>
+                <th className="text-center pb-3 font-medium">T.gian phản hồi</th>
               </tr>
             </thead>
             <tbody>

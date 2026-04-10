@@ -136,7 +136,7 @@ export function ProcessTable({ processes, onChange, showPriority = false, queueO
               <th className="text-left pb-2 pr-4 font-medium">Tên</th>
               <th className="text-left pb-2 pr-4 font-medium">T.gian đến (AT)</th>
               <th className="text-left pb-2 pr-4 font-medium">T.gian chạy (BT)</th>
-              {showPriority && <th className="text-left pb-2 pr-4 font-medium">Ưu tiên (Pri)</th>}
+              {showPriority && <th className="text-left pb-2 pr-4 font-medium">Ưu tiên (Priority)</th>}
               {showQueue && <th className="text-left pb-2 pr-4 font-medium">Hàng đợi</th>}
               <th className="pb-2 w-8" />
             </tr>
